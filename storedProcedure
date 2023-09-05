@@ -111,21 +111,21 @@ execute function generateappointmentslots();
 alter table ajayschedule enable trigger slotgenerationtrigger;
 
 
-create or replace procedure updateslots(doctorid int,fromtime time,totime time) 
+create or replace procedure updateslots(doctorid int) 
 as $$
 declare
 	
 
    begin
       
-	  delete from ajayappointmentslots where fromtime >= (select fromtime from ajayappointmentslots) 
-      and fromtime <= (select totime from ajayappointmentslots);
+	  delete from ajayappointmentslots;
+      call generateslots(doctorid);
    END;
 $$ LANGUAGE plpgsql;
 
 create or replace function updateappointmentslots() returns trigger AS $$
    begin
-      call updateslots(old.doctorid,new.slotfrom,old.slotfrom);
+      call updateslots(new.doctorid);
       return new;
    end;
 $$ language plpgsql;
@@ -134,7 +134,8 @@ create trigger slotupdatetrigger
 after update on ajayschedule
 for each row
 execute function updateappointmentslots();
-   
+
+alter table ajayschedule enable trigger slotupdatetrigger;
 
 
 
