@@ -1,57 +1,31 @@
-
-create table ajayschedule as 
-select * from ajayschedule;
-select * from appointmentsslotcalendar;
-create table ajayappointmentslots as 
-select * from appointmentsslotcalendar;
-DELETE FROM ajayschedule;
-
-insert into ajayschedule values(1,2,'0123456','09:00:00','12:00:00',15);
-
-CREATE TRIGGER slotgenerationtrigger
-AFTER INSERT ON ajayschedule
-FOR EACH ROW
-EXECUTE FUNCTION generateslots(NEW.doctorid);
-
-
-
-CREATE OR REPLACE FUNCTION slotduration(startdate TIME, slottime INT)
-RETURNS TIME AS
+create or replace function isAvailable(doctorschedule text, slotday INT)
+returns BOOLEAN AS
 $$
-DECLARE
-    newtime TIME;
-BEGIN
-    newtime := startdate + (slottime || ' minutes')::INTERVAL;
-    RETURN newtime;
-END;
-$$
-LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION isAvailable(doctorschedule text, slotday INT)
-RETURNS TIME AS
-$$
-DECLARE
+declare
     slotdaytext text;
-BEGIN
-    slotdaytext:=slotday::text;
+begin
+    slotdaytext := slotday::text;
     return doctorschedule like '%' || slotdaytext || '%';
-    
-END;
+end;
 $$
-LANGUAGE plpgsql;
+language plpgsql;
 
 
-CREATE OR REPLACE FUNCTION generateslot(slotstarttime TIME, slottime INT)
-RETURNS TIME AS
-$$
-BEGIN
-    RETURN slotstarttime + (slottime || ' minutes')::INTERVAL;
-END;
-$$
-LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION noofslot(totaltime TIME, avgtime INT)
+create or replace function generateslot(slotstarttime TIME, slottime INT)
+returns time as
+$$
+begin
+   
+    return (slotstarttime::time + (slottime || ' minutes')::interval)::TIME;
+end;
+$$
+language plpgsql;
+
+
+
+
+create or replace function noofslots(totaltime TIME, avgtime INT)
 RETURNS INT AS
 $$
 DECLARE
@@ -59,127 +33,80 @@ DECLARE
     avgseconds INT;
     numberofslots INT;
 BEGIN
-
-    totalseconds := EXTRACT(EPOCH FROM totaltime);
+    totalseconds := EXTRACT(EPOCH FROM totaltime)::INT;
     avgseconds := avgtime * 60; 
     numberofslots := totalseconds / avgseconds;
 
-    RETURN numberofslots::INT;
+    RETURN numberofslots;
 END;
 $$
 LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION generateslots(doctid integer) 
-RETURNS void AS
+create or replace Procedure generateslots(doctid int) 
+as 
 $$
-DECLARE
+declare
     currentdate date;
     slotrange int;
     dayvalue int;
-     doctorschedule text;
-	starttime time;
-	endtime time;
-    avgtime time;
+    doctorschedule text;
+    starttime time;
+    endtime time;
+    avgtime int;
     totaltime time;
+    totalslots int;
+	slottime time;
 BEGIN
-    	currentdate := NOW()::date;
-	select range from doctorrange where doctorid=doctid into slotrange;
-    FOR i IN 1..slotrange LOOP
-        
-        IF NOT EXISTS (
-            SELECT slotdate
-            FROM ajayappointmentslots
-            WHERE slotdoctorid = generateslots.doctid
-            AND slotdate = currentdate
-        ) THEN
-		SELECT extract(dow FROM currentdate::date) INTO dayvalue;
-   		SELECT doctorschedule INTO doctorschedule
-    		FROM ajayschedule
-    		WHERE doctorid = doctid; 
+	
+    currentdate := NOW()::date;
+    select range from doctorrange where doctorid = doctid into slotrange;
+    for i in 1..slotrange loop
+        if not exists (
+            select slotdate
+            from ajayappointmentslots
+            where slotdoctorid = doctid
+            and slotdate = currentdate
+        ) then
+            select extract(DOW from currentdate::DATE) into dayvalue;
+            select ajayschedule.doctorschedule into doctorschedule
+    		from ajayschedule
+    		where doctorid = doctid;
 
-			IF isAvailable(doctorschedule,dayvalue)
-			THEN 
-			select doctoravailablefrom from ajayschedule where doctorid=doctid into starttime;
-			select doctoravailableto from ajayschedule where doctorid=doctid into endtime;
-			select doctoravailableslot from ajayschedule where doctorid=doctid into avgtime;
-			totaltime := (timestamp '1970-01-01' + (timestamp 'starttime' - timestamp 'endtime'))::TIME;
-
-
-				FOR i in 1..noofslots(totaltime,avgtime) LOOP
-					select generateslot(starttime,avgtime) as slotto;
-					insert into ajayappointmentslots(slotdoctorid,slotdate,slotfrom,slotto,slotstatus) values(doctid,currentdate,starttime,slotto,'available');
-            			starttime:=slotto;
-				END LOOP
-            END IF;
-        END IF;
-
-        
-        currentdate := currentdate + 1;
-    END LOOP;
-END;
-$$
-LANGUAGE plpgsql;
-
-
-
-DROP FUNCTION generateslots;
-
-CREATE OR REPLACE FUNCTION generateslots() 
-RETURNS TRIGGER AS 
-$slotgenerationtrigger$
-DECLARE
-    currentdate DATE;
-    slotrange INT;
-    dayvalue INT;
-    doctorschedule TEXT;
-    starttime TIME;
-    endtime TIME;
-    avgtime TIME;
-    totaltime INTERVAL;
-    doctid int;
-BEGIN
-	doctid := NEW.doctorid;
-    currentdate := NOW()::DATE;
-    SELECT range FROM doctorrange WHERE doctorid = doctid INTO slotrange;
-    FOR i IN 1..slotrange LOOP
-        IF NOT EXISTS (
-            SELECT slotdate
-            FROM ajayappointmentslots
-            WHERE slotdoctorid = doctid
-            AND slotdate = currentdate
-        ) THEN
-            SELECT EXTRACT(DOW FROM currentdate::DATE) INTO dayvalue;
-            SELECT ajayschedule.doctorschedule INTO doctorschedule
-    FROM ajayschedule
-    WHERE doctorid = doctid;
-
-            IF isAvailable(doctorschedule, dayvalue) THEN 
-                SELECT doctoravailablefrom INTO starttime FROM ajayschedule WHERE doctorid = doctid;
-                SELECT doctoravailableto INTO endtime FROM ajayschedule WHERE doctorid = doctid;
-                SELECT doctoravailableslot INTO avgtime FROM ajayschedule WHERE doctorid = doctid;
-                totaltime := (timestamp '1970-01-01' + (starttime - endtime));
-
-                FOR j IN 1..noofslots(totaltime, avgtime) LOOP
-                    starttime := generateslot(starttime, avgtime);
-                    INSERT INTO ajayappointmentslots(slotdoctorid, slotdate, slotfrom, slotto, slotstatus)
-                    VALUES (doctid, currentdate, starttime, generateslot(starttime, avgtime), 'available');
+            if isAvailable(doctorschedule, dayvalue) then 
+                select doctoravailablefrom into starttime from ajayschedule where doctorid = doctid;
+                select doctoravailableto into endtime from ajayschedule where doctorid = doctid;
+                select doctoravailableslot into avgtime from ajayschedule where doctorid = doctid;
+				starttime := starttime::TIME;
+    			endtime := endtime::TIME;
+                select doctoravailableto-doctoravailablefrom into totaltime from ajayschedule where doctorid = doctid;
+				select noofslots(totaltime, avgtime) into totalslots;
+                for j IN 1..totalslots loop
+                    SELECT generateslot(starttime, avgtime) INTO slottime;
+                    insert into ajayappointmentslots(slotdoctorid, slotdate, slotfrom, slotto, slotstatus)
+                    VALUES (doctid, currentdate, starttime,slottime , 'available');
+					starttime := generateslot(starttime, avgtime);
                 END LOOP;
             END IF;
         END IF;
         currentdate := currentdate + 1;
     END LOOP;
-    RETURN NEW; -- Return NEW to indicate success
+    
 END;
-$slotgenerationtrigger$
+$$
 LANGUAGE plpgsql;
 
--- Create the trigger
+create or replace function generateappointmentslots() returns trigger AS $$
+   begin
+      call generateslots(new.doctorid);
+      return new;
+   end;
+$$ language plpgsql;
+drop trigger 
 CREATE TRIGGER slotgenerationtrigger
 AFTER INSERT ON ajayschedule
 FOR EACH ROW
-EXECUTE FUNCTION generateslots();
+EXECUTE FUNCTION generateappointmentslots();
 
 alter table ajayschedule enable trigger slotgenerationtrigger;
-
 
