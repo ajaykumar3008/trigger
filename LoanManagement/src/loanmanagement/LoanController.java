@@ -1,5 +1,7 @@
 package loanmanagement;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,20 +24,63 @@ public class LoanController {
 		return "customer";
 	}
 
-	@RequestMapping(value = "/loan", method = RequestMethod.GET)
-	public String applyLoan(LoanCustomer cust, Model mod) {
+	@RequestMapping(value = "/applicant", method = RequestMethod.GET)
+	public String nominee(LoanCustomer customer, HttpSession ses) {
 
-		mod.addAttribute("customer", cust);
-		System.out.println(cust.getCust_address());
-		return "loan";
+		ses.setAttribute("customer", customer);
+
+		return "customer";
+	}
+
+	@RequestMapping(value = "/loan", method = RequestMethod.GET)
+	public String loan(LoanApplication loanForm, HttpSession ses) {
+
+		ses.setAttribute("loan", loanForm);
+
+		return "customer";
 	}
 
 	@RequestMapping(value = "/nominee", method = RequestMethod.GET)
-	public String nominee(LoanApplication la) {
+	public String nominee(Nominee nomine, HttpSession ses) {
 
-		System.out.println(la);
-		// mod.addAttribute("customer", cust);
+		LoanCustomer application = (LoanCustomer) ses.getAttribute("customer");
+		LoanApplication loan = (LoanApplication) ses.getAttribute("loan");
+		loanServ.addCustomer(application);
+		Loan ln = new Loan();
+		ln.setCustomerid(loanServ.getAllCustomers());
+		ln.setApplicationdate(loan.getApplicationDate().toString());
+		ln.setLoantype(loan.getLoanTypeID());
+		ln.setAmountreq(loan.getAmountRequired());
+		ln.setMonthsreq(loan.getMonthsRequired());
+		loanServ.addLoan(ln);
+		loanServ.addNominee(nomine);
+		return "home";
 
-		return "preview";
 	}
+
+	@RequestMapping(value = "/adminlogin", method = RequestMethod.GET)
+	public String adminlogin() {
+
+		return "adminlogin";
+	}
+
+	@RequestMapping(value = "/verify", method = RequestMethod.GET)
+	public String verify(Credentials cred) {
+
+		if (loanServ.verifyCredentials(cred.getUser(), cred.getPassword())) {
+
+			return "loanmanagement";
+		}
+
+		return "adminlogin";
+	}
+
+	@RequestMapping(value = "/applications", method = RequestMethod.GET)
+	public String applicants(Model mod) {
+
+		System.out.println("ghdas");
+		mod.addAttribute("applications", loanServ.getAllApplication());
+		return "applications";
+	}
+
 }

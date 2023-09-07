@@ -1,21 +1,37 @@
 package loanmanagement;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Table(name = "loanapplicants")
+@Entity
 public class LoanApplication {
 
-	int customerID;
-	String applicationDate;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	int loan_applicant_id;
+	@Column(name = "loan_application_date")
+	Date applicationDate;
+	@Column(name = "loan_type_id")
 	int loanTypeID;
+	@Column(name = "loan_amount_req")
 	double amountRequired;
+	@Column(name = "loan_no_of_req")
 	int monthsRequired;
 
 	public LoanApplication() {
 
 	}
 
-	public LoanApplication(int customerID, String applicationDate, int loanTypeID, double amountRequired,
-			int monthsRequired) {
+	public LoanApplication(Date applicationDate, int loanTypeID, double amountRequired, int monthsRequired) {
 
-		this.customerID = customerID;
 		this.applicationDate = applicationDate;
 		this.loanTypeID = loanTypeID;
 		this.amountRequired = amountRequired;
@@ -23,11 +39,7 @@ public class LoanApplication {
 		this.monthsRequired = monthsRequired;
 	}
 
-	public int getCustomerID() {
-		return customerID;
-	}
-
-	public String getApplicationDate() {
+	public Date getApplicationDate() {
 		return applicationDate;
 	}
 
@@ -43,12 +55,16 @@ public class LoanApplication {
 		return monthsRequired;
 	}
 
-	public void setCustomerID(int customerID) {
-		this.customerID = customerID;
-	}
-
 	public void setApplicationDate(String applicationDate) {
-		this.applicationDate = applicationDate;
+		try {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date utilDate = dateFormat.parse(applicationDate);
+			this.applicationDate = new Date(utilDate.getTime());
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
 	}
 
 	public void setLoanTypeID(int loanTypeID) {
