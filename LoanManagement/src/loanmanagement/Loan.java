@@ -9,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name = "loan_applicants")
+@Table(name = "ajayapplicants")
 @Entity
 public class Loan {
 
@@ -23,6 +23,8 @@ public class Loan {
 	double emirangefrom = 0;
 	double emirangeto = 0;
 	int monthsreq;
+	double annualincome;
+	double disposalincome;
 	int cibilscore = 0;
 	String status = "";
 	String remarks = "";
@@ -50,6 +52,22 @@ public class Loan {
 		this.remarks = remarks;
 		this.processeduser = processeduser;
 		this.processeddate = processeddate;
+	}
+
+	public double getAnnualincome() {
+		return annualincome;
+	}
+
+	public double getDisposalincome() {
+		return disposalincome;
+	}
+
+	public void setAnnualincome(double annualincome) {
+		this.annualincome = annualincome;
+	}
+
+	public void setDisposalincome(double disposalincome) {
+		this.disposalincome = disposalincome;
 	}
 
 	public int getApplicantid() {

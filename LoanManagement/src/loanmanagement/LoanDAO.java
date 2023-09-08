@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 public class LoanDAO implements LoanDAOContractor {
 
@@ -30,9 +31,9 @@ public class LoanDAO implements LoanDAOContractor {
 	}
 
 	@Override
-	public List<Credentials> getAllCredentials() {
+	public List<User> getAllCredentials() {
 
-		return emt.createQuery("select user from Credentials user").getResultList();
+		return emt.createQuery("select user from User user").getResultList();
 	}
 
 	@Override
@@ -45,6 +46,17 @@ public class LoanDAO implements LoanDAOContractor {
 	public List<LoanCustomer> getAllCustomers() {
 
 		return emt.createQuery("select cust from LoanCustomer cust").getResultList();
+	}
+
+	@Override
+	public void updateApplication(String status, int id) {
+
+		String jpql = "UPDATE Loan c SET c.status = :status WHERE c.applicantid = :applicantid";
+		Query query = emt.createQuery(jpql);
+		query.setParameter("status", status);
+		query.setParameter("applicantid", id);
+		query.executeUpdate();
+
 	}
 
 }

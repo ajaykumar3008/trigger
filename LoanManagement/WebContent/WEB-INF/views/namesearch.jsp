@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -68,28 +69,13 @@
         </ul>
     </div>
     <div class="content">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+       <nav class="navbar navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Home</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
-      <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Search by
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-           <li><a class="dropdown-item" href="http://localhost:8081/LoanManagement/namefilter">By Name</a></li>
-            <li><a class="dropdown-item" href="http://localhost:8081/LoanManagement/mobilefilter">By Mobile</a></li>
-            <li><a class="dropdown-item" href="http://localhost:8081/LoanManagement/datefilter">Date Range</a></li>
-            <li><a class="dropdown-item" href="http://localhost:8081/LoanManagement/amountfillter">Amount Range</a></li>
-            <li><a class="dropdown-item" href="http://localhost:8081/LoanManagement/loanfilter">Loan Type</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
+    <a class="navbar-brand">back</a>
+    <form class="d-flex">
+      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
   </div>
 </nav>
         

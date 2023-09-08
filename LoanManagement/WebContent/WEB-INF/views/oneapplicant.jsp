@@ -1,6 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*,loanmanagement.*" %>
-<% List<Loan> appList = (List<Loan>) request.getAttribute("applications"); %>
+<% Loan app = (Loan) request.getAttribute("applicant"); %>
+<%String type="";if(app.getLoantype()==1){
+	type="personal";
+}else if(app.getLoantype()==2){
+	type="home";
+}else{
+	type="vehical";
+}
+	%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,6 +117,19 @@
         .btn:hover {
             background-color: #0056b3;
         }
+         label {
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        h1 {
+            text-align: center;
+        }
     </style>
     <title>Left Top Menu Page</title>
 </head>
@@ -122,26 +143,50 @@
         </ul>
     </div>
     <div class="content">
-        <h1>Loan Applications</h1>
-        <table>
-            <tr>
-                <th><h3>Customer Id</h3></th>
-                <th><h3>App Date</h3></th>
-                <th><h3>LoanType</h3></th>
-                <th><h3>amountReq</h3></th>
-                <th></th>
-            </tr>
-            <% for (Loan loan : appList) { %>
-                <tr>
-                    <td><%= loan.getCustomerid() %></td>
-                    <td><%= loan.getApplicationdate() %></td>
-                    <td><%= loan.getLoantype() %></td>
-                    <td><%= loan.getAmountreq() %></td>
-                    <td><a class="btn" href="http://localhost:8081/LoanManagement/oneapplicant?applicant=<%=loan.getApplicantid()%>">Details</a></td>
-                </tr>
-            <% } %>
-        </table><br><br><div align="center">
-        <a class="btn btn-primary" href="http://localhost:8081/LoanManagement/generateexcel">Downlod</a></div>
+       <h1>Loan Application</h1>
+        <form action="http://localhost:8081/LoanManagement/updateapplication" method="get">
+            <div class="form-group">
+                <label for="applicantid">Application Id:</label>
+                <input type="text" class="form-control" id="applicantid" name="applicantid" value="<%=app.getApplicantid()%>">
+            </div>
+            <div class="form-group">
+                <label for="customerid">Customer Id:</label>
+                <input type="text" class="form-control" id="customerid" name="customerid" value="<%=app.getCustomerid()%>">
+            </div>
+            <div class="form-group">
+                <label for="applicationdate">Application Date:</label>
+                <input type="text" class="form-control" id="applicationdate" name="applicationdate" value="<%=app.getApplicationdate()%>">
+            </div>
+            <div class="form-group">
+                <label for="loantype">Loan Type:</label>
+                <input type="text" class="form-control" id="loantype" name="loantype" value="<%=type%>">
+            </div>
+            <div class="form-group">
+                <label for="amountreq">Amount Required:</label>
+                <input type="text" class="form-control" id="amountreq" name="amountreq" value="<%=app.getAmountreq()%>">
+            </div>
+            <div class="form-group">
+                <label for="monthsreq">Months Required To Pay:</label>
+                <input type="text" class="form-control" id="monthsreq" name="monthsreq" value="<%=app.getMonthsreq()%>">
+            </div>
+            <div class="form-group">
+                <label for="status">Update Status:</label>
+                <input type="text" class="form-control" id="status" name="status" value="<%=app.getStatus()%>">
+            </div>
+            <div align="center">
+            <button class="btn btn-primary">Save</button></div>
+        </form>
     </div>
+    
+    <script>
+    document.getElementById("applicantid").readOnly=true;
+    document.getElementById("customerid").readOnly=true;
+    document.getElementById("loantype").readOnly=true;
+    document.getElementById("applicationdate").readOnly=true;
+    document.getElementById("amountreq").readOnly=true;
+    document.getElementById("monthsreq").readOnly=true;
+
+    
+    </script>
 </body>
 </html>

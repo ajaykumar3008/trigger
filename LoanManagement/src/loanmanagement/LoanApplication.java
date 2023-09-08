@@ -25,6 +25,8 @@ public class LoanApplication {
 	double amountRequired;
 	@Column(name = "loan_no_of_req")
 	int monthsRequired;
+	double annualincome;
+	double disposalincome;
 
 	public LoanApplication() {
 
@@ -37,6 +39,22 @@ public class LoanApplication {
 		this.amountRequired = amountRequired;
 
 		this.monthsRequired = monthsRequired;
+	}
+
+	public double getAnnualincome() {
+		return annualincome;
+	}
+
+	public double getDisposalincome() {
+		return disposalincome;
+	}
+
+	public void setAnnualincome(double annualincome) {
+		this.annualincome = annualincome;
+	}
+
+	public void setDisposalincome(double disposalincome) {
+		this.disposalincome = disposalincome;
 	}
 
 	public Date getApplicationDate() {

@@ -12,10 +12,12 @@ public interface LoanDAOContractor {
 
 	void addNominee(Nominee nomine);
 
-	List<Credentials> getAllCredentials();
+	List<User> getAllCredentials();
 
 	void addLoan(Loan ln);
 
 	List<LoanCustomer> getAllCustomers();
+
+	void updateApplication(String status, int id);
 
 }

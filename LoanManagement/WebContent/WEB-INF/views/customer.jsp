@@ -111,7 +111,14 @@
                 <label for="numMonths">Number of Months:</label>
                 <input type="text" class="form-control" name="monthsRequired" id="numMonths" required>
             </div>
-
+			<div class="form-group">
+                <label for="annualincome">Annual Income:</label>
+                <input type="text" class="form-control" name="annualincome" id="annualincome" required>
+            </div>
+            <div class="form-group">
+                <label for="disposalincome">Disposal Income:</label>
+                <input type="text" class="form-control" name="disposalincome" id="disposalincome" required>
+            </div>
             <button type="submit">Next</button>
         </form>
 
@@ -129,41 +136,49 @@
 
      
     </div>
+<script>
+    let currentTab = 0;
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const tabs = document.querySelectorAll(".tabs li");
-            const forms = document.querySelectorAll(".tab-content");
-            const submitAllFormsButton = document.getElementById("submitAllForms");
+    function openTab(evt, tabName) {
+        const tabs = document.getElementsByClassName("tab");
+        for (let i = 0; i < tabs.length; i++) {
+            tabs[i].style.display = "none";
+        }
+        document.getElementById(tabName).style.display = "block";
+    }
 
-            tabs.forEach((tab, index) => {
-                tab.addEventListener("click", function (event) {
-                    event.preventDefault();
+    function submitForm(formId) {
+        const formData = new FormData(document.getElementById(formId));
+        // Here, you can send the form data to your server using AJAX or other methods.
+        console.log("Form data submitted:", formData);
+    }
 
-                    tabs.forEach((t) => t.classList.remove("active"));
-                    forms.forEach((form) => {
-                        form.classList.remove("active");
-                    });
+    function submitFormAndNext(nextTabName, formId) {
+        submitForm(formId);
+        nextTab(nextTabName);
+    }
 
-                    tab.classList.add("active");
-                    forms[index].classList.add("active");
-                });
-            });
+    function nextTab(tabName) {
+        const tabs = document.getElementsByClassName("tab");
+        if (currentTab < tabs.length - 1) {
+            tabs[currentTab].style.display = "none";
+            currentTab++;
+            openTab(null, tabName);
+        }
+    }
 
-            submitAllFormsButton.addEventListener("click", function () {
-                const formData = new FormData();
+    function prevTab(tabName) {
+        const tabs = document.getElementsByClassName("tab");
+        if (currentTab > 0) {
+            tabs[currentTab].style.display = "none";
+            currentTab--;
+            openTab(null, tabName);
+        }
+    }
 
-                forms.forEach((form) => {
-                    for (const [key, value] of new FormData(form)) {
-                        formData.append(key, value);
-                    }
-                });
+    // Show the initial tab
+    openTab(null, 'tab1');
+</script>
 
-             // Convert formData to a query string
-               
-
-            });
-        });
-    </script>
 </body>
 </html>

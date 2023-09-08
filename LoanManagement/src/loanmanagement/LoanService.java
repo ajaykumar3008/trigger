@@ -36,16 +36,38 @@ public class LoanService {
 	@Transactional
 	public boolean verifyCredentials(String user, String password) {
 
-		List<Credentials> ls = loanDAO.getAllCredentials();
+		List<User> ls = loanDAO.getAllCredentials();
+		System.out.println(ls.get(3).getPassword());
 		boolean check = false;
-		for (Credentials c : ls) {
-			if (c.getUser().equals(user) && c.getPassword().equals(password)) {
+		for (User c : ls) {
+			if (c.getUsername().equals(user) && password.equals(c.getPassword())) {
 				check = true;
 				break;
 			}
 		}
 
 		return check;
+	}
+
+	@Transactional
+	public String verifyuser(String user, String password) {
+
+		List<User> ls = loanDAO.getAllCredentials();
+		String type = "";
+		int id;
+		for (User c : ls) {
+			if (c.getUsername().equals(user) && password.equals(c.getPassword())) {
+				id = c.getUserid();
+				if ("admin".equals(c.getUsertype())) {
+					type = "admin";
+				} else {
+					type = "user";
+				}
+				break;
+			}
+		}
+
+		return type;
 	}
 
 	public List<Loan> getAllApplication() {
@@ -62,6 +84,28 @@ public class LoanService {
 
 		List<LoanCustomer> ls = loanDAO.getAllCustomers();
 
-		return ls.size() - 1;
+		return ls.size();
+	}
+
+	public Loan getLoanApplicant(int appid) {
+
+		List<Loan> ls = loanDAO.findAll();
+		Loan loan = new Loan();
+
+		for (Loan ln : ls) {
+
+			if (ln.getApplicantid() == appid) {
+				loan = ln;
+				break;
+			}
+		}
+		return loan;
+	}
+
+	@Transactional
+	public void updateApplication(String status, int id) {
+
+		loanDAO.updateApplication(status, id);
+
 	}
 }

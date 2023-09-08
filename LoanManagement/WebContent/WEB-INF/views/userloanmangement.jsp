@@ -61,8 +61,8 @@
 
     <div class="menu">
         <ul>
-            <li><a href="http://localhost:8081/LoanManagement/applications">Loan Applicants</a></li>
-            <li><a href="#">Loans</a></li>
+            
+            <li><a href="http://localhost:8081/LoanManagement/loans">Loans</a></li>
             <li><a href="#">Repayments</a></li>
             <li><a href="#">Contact</a></li>
         </ul>
