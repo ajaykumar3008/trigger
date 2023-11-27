@@ -1,3 +1,65 @@
+import java.util.*;
+
+public class EuclideanDistance {
+
+    public static double calculateDistance(List<Integer> point1, List<Integer> point2) {
+        return Math.sqrt(Math.pow(point2.get(0) - point1.get(0), 2) + Math.pow(point2.get(1) - point1.get(1), 2));
+    }
+
+    public static List<Integer> findMode(List<Integer> distances) {
+        Map<Integer, Integer> countMap = new HashMap<>();
+        List<Integer> modes = new ArrayList<>();
+        int maxCount = 0;
+
+        for (int distance : distances) {
+            int count = countMap.getOrDefault(distance, 0) + 1;
+            countMap.put(distance, count);
+
+            if (count > maxCount) {
+                maxCount = count;
+                modes.clear();
+                modes.add(distance);
+            } else if (count == maxCount && !modes.contains(distance)) {
+                modes.add(distance);
+            }
+        }
+
+        return modes;
+    }
+
+    public static List<Integer> findModeInEuclideanDistances(List<List<Integer>> coordinates) {
+        if (coordinates == null || coordinates.size() <= 1) {
+            return Collections.singletonList(-1);
+        }
+
+        List<Integer> distances = new ArrayList<>();
+
+        for (int i = 0; i < coordinates.size() - 1; i++) {
+            List<Integer> point1 = coordinates.get(i);
+            List<Integer> point2 = coordinates.get(i + 1);
+            double distance = Math.floor(calculateDistance(point1, point2));
+            distances.add((int) distance);
+        }
+
+        return findMode(distances);
+    }
+
+    public static void main(String[] args) {
+        List<List<Integer>> coordinates = new ArrayList<>();
+        coordinates.add(Arrays.asList(-11, 3));
+        coordinates.add(Arrays.asList(8, 5));
+        coordinates.add(Arrays.asList(-3, 2));
+        coordinates.add(Arrays.asList(9, 17));
+
+        List<Integer> mode = findModeInEuclideanDistances(coordinates);
+
+        if (mode.size() == 1 && mode.get(0) == -1) {
+            System.out.println("Input does not satisfy constraints.");
+        } else {
+            System.out.println("The mode(s) of the distances is: " + mode);
+        }
+    }
+}
 timport java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
