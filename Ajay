@@ -1,5 +1,45 @@
 import java.util.*;
 
+class ExclusiveTime {
+    public List<Integer> exclusiveTime(int n, List<String> logs) {
+        List<Integer> exclusiveTimes = new ArrayList<>(Collections.nCopies(n, 0));
+        Stack<Integer> stack = new Stack<>();
+        int prevTime = 0;
+
+        for (String log : logs) {
+            String[] parts = log.split(":");
+            int functionId = Integer.parseInt(parts[0]);
+            String status = parts[1];
+            int timestamp = Integer.parseInt(parts[2]);
+
+            if (status.equals("start")) {
+                if (!stack.isEmpty()) {
+                    exclusiveTimes.set(stack.peek(), exclusiveTimes.get(stack.peek()) + timestamp - prevTime);
+                }
+                stack.push(functionId);
+                prevTime = timestamp;
+            } else {
+                exclusiveTimes.set(stack.pop(), exclusiveTimes.get(stack.pop()) + timestamp - prevTime + 1);
+                prevTime = timestamp + 1;
+            }
+        }
+        return exclusiveTimes;
+    }
+}
+
+// Usage example:
+public class Main {
+    public static void main(String[] args) {
+        int n = 3;
+        List<String> logs = Arrays.asList("0:start:0", "2:start:5", "1:start:7", "1:end:10", "0:end:15");
+        
+        ExclusiveTime exclusiveTime = new ExclusiveTime();
+        List<Integer> result = exclusiveTime.exclusiveTime(n, logs);
+        System.out.println(result);
+    }
+}
+import java.util.*;
+
 public class EuclideanDistance {
 
     public static double calculateDistance(List<Integer> point1, List<Integer> point2) {
