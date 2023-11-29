@@ -1,5 +1,44 @@
 import java.util.*;
 
+public class CoprimeCount {
+    public static List<Integer> coprimeCount(List<Integer> A) {
+        List<Integer> result = new ArrayList<>();
+
+        for (int num : A) {
+            result.add(countCoprimes(num));
+        }
+
+        return result;
+    }
+
+    // Function to count co-primes for a given number
+    private static int countCoprimes(int num) {
+        int count = 0;
+        for (int j = 1; j <= num; j++) {
+            if (gcd(num, j) == 1) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // Function to calculate GCD of two numbers
+    private static int gcd(int a, int b) {
+        if (b == 0) {
+            return a;
+        }
+        return gcd(b, a % b);
+    }
+
+    // Usage example
+    public static void main(String[] args) {
+        List<Integer> A = Arrays.asList(5, 8, 14);
+        List<Integer> result = coprimeCount(A);
+        System.out.println(result);
+    }
+}
+import java.util.*;
+
 class ExclusiveTime {
     public List<Integer> exclusiveTime(int n, List<String> logs) {
         List<Integer> exclusiveTimes = new ArrayList<>(Collections.nCopies(n, 0));
